@@ -8,7 +8,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    caches.open('hub-v3').then(c =>
+    caches.open('hub-v4').then(c =>
       c.match(e.request).then(hit => hit || fetch(e.request).then(r => { c.put(e.request, r.clone()); return r; }))
     )
   );
@@ -37,7 +37,7 @@ self.addEventListener('message', e => {
   }
   if(e.data?.type==='WIN_ALERT') {
     self.registration.showNotification('⚡ BIG MONEY HIT!', {
-      body: 'Number ' + e.data.number + ' predicted correctly!',
+      body: 'Numbers predicted correctly!',
       tag:'win', renotify:true, vibrate:[100,50,100,50,500]
     });
   }
@@ -45,5 +45,5 @@ self.addEventListener('message', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.matchAll({type:'window'}).then(l => l.length ? l[0].focus() : clients.openWindow('/')));
+  e.waitUntil(clients.matchAll({type:'window'}).then(l => l.length ? l[0].focus() : clients.openWindow('./')));
 });
