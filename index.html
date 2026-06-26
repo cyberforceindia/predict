@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pred Hub">
 
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="./manifest.json">
 
 <title>Hacker's Prediction Hub - Big Money Edition</title>
 <style>
@@ -61,7 +61,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .pill.big{color:var(--green);background:rgba(0,255,136,0.06);border-color:var(--green);text-shadow:0 0 16px rgba(0,255,136,0.5);}
 .pill.small{color:var(--red);background:rgba(255,45,85,0.06);border-color:var(--red);text-shadow:0 0 16px rgba(255,45,85,0.5);}
 .pill.wait{color:var(--dim);background:transparent;border-color:var(--border2);}
-.num-pill{display:inline-block;font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--gold);background:rgba(255,215,0,0.06);border:1px solid var(--gold);padding:11px 20px;border-radius:3px;text-shadow:0 0 16px rgba(255,215,0,0.5);}
+.num-container{display:flex;gap:8px;justify-content:center;align-items:center;}
+.num-pill{display:inline-block;font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:var(--gold);background:rgba(255,215,0,0.06);border:1px solid var(--gold);padding:11px 16px;border-radius:3px;text-shadow:0 0 16px rgba(255,215,0,0.5);}
 .pdiv{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:13px 0 11px;}
 .alrt{font-size:9px;letter-spacing:1px;min-height:16px;padding:4px 10px;border-radius:2px;display:inline-block;}
 .alrt.win{color:var(--green);background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.2);}
@@ -138,7 +139,6 @@ td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);tex
     <span id="swStatus">INITIALIZING...</span>
   </div>
 
-  <!-- Install prompt banner -->
   <div class="install-bar" id="installBar">
     <span class="install-txt">⬇ ADD TO HOME SCREEN FOR BEST EXPERIENCE</span>
     <button class="install-btn" id="installBtn" onclick="triggerInstall()">INSTALL</button>
@@ -160,11 +160,14 @@ td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);tex
         <div class="plbl">UPCOMING PERIOD</div>
         <div class="pval" id="upPeriod">—</div>
       </div>
-      <div class="pright">CURRENT PREDICTION</div>
+      <div class="pright">DUAL TARGET PRED</div>
     </div>
     <div class="pill-container">
       <div class="pill wait" id="pill">—</div>
-      <div class="num-pill" id="numPill">-</div>
+      <div class="num-container">
+        <div class="num-pill" id="numPill1">-</div>
+        <div class="num-pill" id="numPill2">-</div>
+      </div>
     </div>
     <div class="pdiv"></div>
     <span class="alrt empty" id="alrt"></span>
@@ -250,15 +253,14 @@ function triggerInstall() {
   });
 }
 
-// REAL FILE-BASED SERVICE WORKER REGISTRATION (Fixed for GitHub Pages)
+// SERVICE WORKER ATTACHMENT
 let swReg = null;
 async function registerSW() {
   if (!('serviceWorker' in navigator)) {
     setSWStatus('SW NOT SUPPORTED', false); return;
   }
   try {
-    // Calling the actual sw.js file present in the same directory
-    swReg = await navigator.serviceWorker.register('sw.js'); 
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' }); 
     setSWStatus('BACKGROUND ENGINE ACTIVE', true);
 
     navigator.serviceWorker.addEventListener('message', e => {
@@ -280,7 +282,6 @@ async function registerSW() {
     }
   } catch(err) {
     setSWStatus('POLLING ACTIVE (SW RESTRICTED)', false, true);
-    console.error('SW Error:', err.message);
   }
 }
 
@@ -290,7 +291,7 @@ function setSWStatus(msg, active, warn=false) {
   d.className = 'sw-dot' + (active ? ' active' : (warn ? ' warn' : ''));
 }
 
-// TELEGRAM MODULE
+// TELEGRAM CONFIG PIPELINE
 let tgConfig = { token:'', chatId:'', lossThreshold:5 };
 
 function loadTgConfig() {
@@ -344,7 +345,7 @@ async function testTelegram() {
   setTimeout(() => { btn.textContent = '⟳ SEND TEST MESSAGE'; }, 3000);
 }
 
-// LOSS STREAK MODULE
+// SYSTEM CALCULATIONS & METRICS
 let consecutiveLosses = 0, tgAlertSent = false;
 
 async function checkLossStreak(wl) {
@@ -357,31 +358,33 @@ async function checkLossStreak(wl) {
   if (consecutiveLosses >= tgConfig.lossThreshold && !tgAlertSent) {
     tgAlertSent = true;
     document.getElementById('streakWarnTitle').textContent = `⚠ ${consecutiveLosses}× CONSECUTIVE LOSSES`;
-    document.getElementById('streakWarnSub').textContent = tgConfig.token ? 'TELEGRAM ALERT DISPATCHED' : 'ADD BOT TOKEN FOR TELEGRAM';
     document.getElementById('streakWarn').classList.add('show');
     navigator.serviceWorker?.controller?.postMessage({ type:'LOSS_ALERT', streak:consecutiveLosses });
     await sendTelegram(
-      `🔴 <b>HACKER'S HUB ALERT</b>\n\n⚠️ <b>${consecutiveLosses} CONSECUTIVE LOSSES!</b>\n📉 Streak: <b>${consecutiveLosses}×</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>\n\n💡 Standard tracking scope criteria matched.`
+      `🔴 <b>HACKER'S HUB ALERT</b>\n\n⚠️ <b>${consecutiveLosses} CONSECUTIVE LOSSES!</b>\n📉 Streak: <b>${consecutiveLosses}×</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>`
     );
   }
 }
 
-// PIPELINE FLOW
 const API = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
-let predMap={}, numMap={}, histLog=[], nextExpectedPeriod=null;
+let predMap={}, numMap1={}, numMap2={}, histLog=[], nextExpectedPeriod=null;
 
 function getActualResultType(n) { return parseInt(n,10)>=5?"BIG":"SMALL"; }
 function calcPred(issueNumber,number) {
   const d=parseInt(String(issueNumber).slice(-1),10), n=parseInt(number,10);
   return ((d*n)%10)%2===0?"BIG":"SMALL";
 }
-function getSingleHighestFreqNum(p,rows) {
-  const pool=p==="BIG"?[5,6,7,8,9]:[0,1,2,3,4];
-  if(!rows||rows.length<5) return p==="BIG"?6:1;
-  const counts={0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
-  rows.slice(0,30).forEach(r=>{const n=parseInt(r.number,10);if(!isNaN(n))counts[n]++;});
-  return pool.sort((a,b)=>counts[b]-counts[a])[0];
+
+// DUAL-NUMBER EXTRACTION ALGORITHM
+function getDualHighestFreqNum(p, rows) {
+  const pool = p === "BIG" ? [5,6,7,8,9] : [0,1,2,3,4];
+  if (!rows || rows.length < 5) return p === "BIG" ? [6,8] : [1,3];
+  const counts = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  rows.slice(0,30).forEach(r => { const n = parseInt(r.number,10); if(!isNaN(n)) counts[n]++; });
+  const sorted = pool.sort((a,b) => counts[b] - counts[a]);
+  return [sorted[0], sorted[1]];
 }
+
 function addOneToPeriod(p){return String(BigInt(String(p))+1n);}
 
 setInterval(()=>{
@@ -410,7 +413,7 @@ function renderHistory(){
     const tc=row.actual==="BIG"?"big":"small",pc=row.pred==="BIG"?"var(--green)":"var(--red)";
     let wlTag=row.wl==="WIN"?'<span class="wl win">WIN</span>':'<span class="wl loss">LOSS</span>';
     if(row.isBigMoneyHit) wlTag='<span class="wl bigmoney">BIG MONEY</span>';
-    html+=`<tr><td>...${String(row.period).slice(-6)}</td><td style="color:#fff;font-weight:bold;">${row.number}</td><td><span class="tag ${tc}">${row.actual}</span></td><td style="color:${pc}">${row.pred} <span style="font-size:8px;color:var(--gold);">[${row.predNum}]</span></td><td>${wlTag}</td></tr>`;
+    html+=`<tr><td>...${String(row.period).slice(-6)}</td><td style="color:#fff;font-weight:bold;">${row.number}</td><td><span class="tag ${tc}">${row.actual}</span></td><td style="color:${pc}">${row.pred} <span style="font-size:8px;color:var(--gold);">[${row.predNum1},${row.predNum2}]</span></td><td>${wlTag}</td></tr>`;
   });
   let w=0,l=0; histLog.forEach(r=>{if(r.wl==="WIN")w++;else l++;});
   wrap.innerHTML=html+'</tbody></table>';
@@ -422,21 +425,22 @@ async function processRows(rows,updateUI=true){
   const curP=String(rows[0].issueNumber),curN=String(rows[0].number),actualType=getActualResultType(curN);
 
   if(nextExpectedPeriod!==null&&curP===nextExpectedPeriod&&predMap.hasOwnProperty(curP)){
-    const sp=predMap[curP],pn=numMap[curP];
-    let wl=sp===actualType?"WIN":"LOSS";
-    const hit=(pn===parseInt(curN,10));
+    const sp=predMap[curP],pn1=numMap1[curP],pn2=numMap2[curP];
+    const targetMatch=(parseInt(curN,10)===pn1||parseInt(curN,10)===pn2);
+    let wl=(sp===actualType||targetMatch)?"WIN":"LOSS";
+    const hit=targetMatch;
     if(hit){
       wl="WIN";
       if(updateUI){
         document.getElementById('entireBody').classList.add('page-celebrate');
         document.getElementById('entireWrap').classList.add('wrapper-celebrate');
         setTimeout(()=>{document.getElementById('entireBody').classList.remove('page-celebrate');document.getElementById('entireWrap').classList.remove('wrapper-celebrate');},2000);
-        showAlrt("⚡ BIG MONEY HIT UNLOCKED! ⚡","win",4000);
+        showAlrt("⚡ BIG MONEY DUAL HIT UNLOCKED! ⚡","win",4000);
       }
-      navigator.serviceWorker?.controller?.postMessage({type:'WIN_ALERT',number:pn});
-      await sendTelegram(`💰 <b>BIG MONEY HIT!</b>\n\n🎯 Number <b>${pn}</b> correct!\n⚡ Period: <b>...${curP.slice(-6)}</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>`);
+      navigator.serviceWorker?.controller?.postMessage({type:'WIN_ALERT'});
+      await sendTelegram(`💰 <b>BIG MONEY HIT!</b>\n\n🎯 Dual Numbers hit sequence successful!\n⚡ Period: <b>...${curP.slice(-6)}</b>`);
     }
-    histLog.unshift({period:curP,number:curN,actual:actualType,pred:sp,predNum:pn,wl,isBigMoneyHit:hit});
+    histLog.unshift({period:curP,number:curN,actual:actualType,pred:sp,predNum1:pn1,predNum2:pn2,wl,isBigMoneyHit:hit});
     if(histLog.length>20) histLog.pop();
     await checkLossStreak(wl);
     nextExpectedPeriod=null;
@@ -444,13 +448,14 @@ async function processRows(rows,updateUI=true){
 
   const up=addOneToPeriod(curP);
   if(nextExpectedPeriod===null){
-    const pred=calcPred(curP,curN),tgt=getSingleHighestFreqNum(pred,rows);
-    predMap[up]=pred; numMap[up]=tgt; nextExpectedPeriod=up;
+    const pred=calcPred(curP,curN),targets=getDualHighestFreqNum(pred,rows);
+    predMap[up]=pred; numMap1[up]=targets[0]; numMap2[up]=targets[1]; nextExpectedPeriod=up;
     if(updateUI){
       document.getElementById('upPeriod').textContent=up.slice(-6);
       const pill=document.getElementById('pill');
       pill.textContent=pred; pill.className='pill '+(pred==="BIG"?"big":"small");
-      document.getElementById('numPill').textContent=tgt;
+      document.getElementById('numPill1').textContent=targets[0];
+      document.getElementById('numPill2').textContent=targets[1];
     }
   }
 
