@@ -138,6 +138,7 @@ td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);tex
     <span id="swStatus">INITIALIZING...</span>
   </div>
 
+  <!-- Install prompt banner -->
   <div class="install-bar" id="installBar">
     <span class="install-txt">⬇ ADD TO HOME SCREEN FOR BEST EXPERIENCE</span>
     <button class="install-btn" id="installBtn" onclick="triggerInstall()">INSTALL</button>
@@ -224,7 +225,7 @@ td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);tex
 </div>
 
 <script>
-// PWA INSTALL PROMPT — Capturing prompt
+// PWA INSTALL PROMPT HANDLING
 let deferredInstallPrompt = null;
 
 window.addEventListener('beforeinstallprompt', e => {
@@ -249,70 +250,15 @@ function triggerInstall() {
   });
 }
 
-// SERVICE WORKER — Strict standalone compatibility block
-const SW_CODE = `
-self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-
-self.addEventListener('fetch', e => {
-  const url = e.request.url;
-  if (url.includes('ar-lottery01.com') || url.includes('api.telegram.org') || url.includes('fonts.')) {
-    e.respondWith(fetch(e.request).catch(() => new Response('', {status:503})));
-    return;
-  }
-  e.respondWith(
-    caches.open('hub-v3').then(c =>
-      c.match(e.request).then(hit => hit || fetch(e.request).then(r => { c.put(e.request, r.clone()); return r; }))
-    )
-  );
-});
-
-self.addEventListener('sync', e => { if(e.tag==='pred-sync') e.waitUntil(bgPoll()); });
-self.addEventListener('periodicsync', e => { if(e.tag==='pred-periodic') e.waitUntil(bgPoll()); });
-
-async function bgPoll() {
-  try {
-    const r = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?t='+Date.now());
-    const j = await r.json();
-    const rows = j?.data?.list;
-    if(!rows?.length) return;
-    const all = await self.clients.matchAll({includeUncontrolled:true});
-    all.forEach(c => c.postMessage({type:'BG_DATA', rows}));
-  } catch(_){}
-}
-
-self.addEventListener('message', e => {
-  if(e.data?.type==='LOSS_ALERT') {
-    self.registration.showNotification('⚠️ HACKER HUB', {
-      body: e.data.streak + ' CONSECUTIVE LOSSES — Pause & review!',
-      tag:'loss', renotify:true, vibrate:[300,150,300,150,300]
-    });
-  }
-  if(e.data?.type==='WIN_ALERT') {
-    self.registration.showNotification('⚡ BIG MONEY HIT!', {
-      body: 'Number ' + e.data.number + ' predicted correctly!',
-      tag:'win', renotify:true, vibrate:[100,50,100,50,500]
-    });
-  }
-});
-
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(clients.matchAll({type:'window'}).then(l => l.length ? l[0].focus() : clients.openWindow('/')));
-});
-`;
-
+// REAL FILE-BASED SERVICE WORKER REGISTRATION (Fixed for GitHub Pages)
 let swReg = null;
 async function registerSW() {
   if (!('serviceWorker' in navigator)) {
     setSWStatus('SW NOT SUPPORTED', false); return;
   }
   try {
-    const blob = new Blob([SW_CODE], { type: 'application/javascript' });
-    const blobUrl = URL.createObjectURL(blob);
-    
-    // Fixed relative assignment without binding standard folder boundaries
-    swReg = await navigator.serviceWorker.register(blobUrl); 
+    // Calling the actual sw.js file present in the same directory
+    swReg = await navigator.serviceWorker.register('sw.js'); 
     setSWStatus('BACKGROUND ENGINE ACTIVE', true);
 
     navigator.serviceWorker.addEventListener('message', e => {
@@ -334,6 +280,7 @@ async function registerSW() {
     }
   } catch(err) {
     setSWStatus('POLLING ACTIVE (SW RESTRICTED)', false, true);
+    console.error('SW Error:', err.message);
   }
 }
 
@@ -343,7 +290,7 @@ function setSWStatus(msg, active, warn=false) {
   d.className = 'sw-dot' + (active ? ' active' : (warn ? ' warn' : ''));
 }
 
-// TELEGRAM INTEGRATION MODULE
+// TELEGRAM MODULE
 let tgConfig = { token:'', chatId:'', lossThreshold:5 };
 
 function loadTgConfig() {
@@ -397,7 +344,7 @@ async function testTelegram() {
   setTimeout(() => { btn.textContent = '⟳ SEND TEST MESSAGE'; }, 3000);
 }
 
-// IN-MEMORY METRIC LOSS STATE TRACKER
+// LOSS STREAK MODULE
 let consecutiveLosses = 0, tgAlertSent = false;
 
 async function checkLossStreak(wl) {
@@ -414,12 +361,12 @@ async function checkLossStreak(wl) {
     document.getElementById('streakWarn').classList.add('show');
     navigator.serviceWorker?.controller?.postMessage({ type:'LOSS_ALERT', streak:consecutiveLosses });
     await sendTelegram(
-      `🔴 <b>HACKER'S HUB ALERT</b>\n\n⚠️ <b>${consecutiveLosses} CONSECUTIVE LOSSES!</b>\n📉 Streak: <b>${consecutiveLosses}×</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>\n\n💡 System diagnostic state limits reached.`
+      `🔴 <b>HACKER'S HUB ALERT</b>\n\n⚠️ <b>${consecutiveLosses} CONSECUTIVE LOSSES!</b>\n📉 Streak: <b>${consecutiveLosses}×</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>\n\n💡 Standard tracking scope criteria matched.`
     );
   }
 }
 
-// DATA FLOW RENDERING PIPELINE
+// PIPELINE FLOW
 const API = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
 let predMap={}, numMap={}, histLog=[], nextExpectedPeriod=null;
 
