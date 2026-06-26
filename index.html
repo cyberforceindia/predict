@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pred Hub">
 
-<link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <title>Hacker's Prediction Hub - Big Money Edition</title>
 <style>
@@ -39,8 +39,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .sw-dot.warn{background:var(--gold);}
 #swStatus{color:var(--dim);}
 
+/* Force Display Flex via style block rule for reliability */
 .install-bar{display:none;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:10px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-radius:3px;gap:10px;}
-.install-bar.show{display:flex;}
 .install-txt{font-size:8px;color:var(--cyan);letter-spacing:2px;flex:1;}
 .install-btn{font-family:'Share Tech Mono',monospace;font-size:8px;color:#000;background:var(--cyan);border:none;border-radius:3px;padding:5px 10px;cursor:pointer;letter-spacing:2px;white-space:nowrap;font-weight:700;}
 
@@ -61,8 +61,11 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .pill.big{color:var(--green);background:rgba(0,255,136,0.06);border-color:var(--green);text-shadow:0 0 16px rgba(0,255,136,0.5);}
 .pill.small{color:var(--red);background:rgba(255,45,85,0.06);border-color:var(--red);text-shadow:0 0 16px rgba(255,45,85,0.5);}
 .pill.wait{color:var(--dim);background:transparent;border-color:var(--border2);}
+
+/* Refreshed Dual Number Container UI */
 .num-container{display:flex;gap:8px;justify-content:center;align-items:center;}
 .num-pill{display:inline-block;font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:var(--gold);background:rgba(255,215,0,0.06);border:1px solid var(--gold);padding:11px 16px;border-radius:3px;text-shadow:0 0 16px rgba(255,215,0,0.5);}
+
 .pdiv{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:13px 0 11px;}
 .alrt{font-size:9px;letter-spacing:1px;min-height:16px;padding:4px 10px;border-radius:2px;display:inline-block;}
 .alrt.win{color:var(--green);background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.2);}
@@ -228,39 +231,49 @@ td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);tex
 </div>
 
 <script>
-// PWA INSTALL PROMPT HANDLING
+// ═══════════════════════════════════════════════════════════
+//  PWA INSTALL PROMPT — FORCED TRIGGER LOGIC
+// ═══════════════════════════════════════════════════════════
 let deferredInstallPrompt = null;
 
 window.addEventListener('beforeinstallprompt', e => {
+  console.log('✓ PWA Installation Criteria Met');
   e.preventDefault();
   deferredInstallPrompt = e;
-  document.getElementById('installBar').classList.add('show');
+  const banner = document.getElementById('installBar');
+  if (banner) banner.style.display = 'flex';
 });
 
 window.addEventListener('appinstalled', () => {
-  document.getElementById('installBar').classList.remove('show');
+  console.log('✓ App installed successfully!');
+  const banner = document.getElementById('installBar');
+  if (banner) banner.style.display = 'none';
   deferredInstallPrompt = null;
 });
 
 function triggerInstall() {
-  if (!deferredInstallPrompt) return;
+  if (!deferredInstallPrompt) {
+    alert("किन्हीं कारणों से ब्राउज़र ऑटो-प्रॉम्प्ट ब्लॉक कर रहा है।\n\nइसे इंस्टॉल करने के लिए ऊपर दाईं ओर बने 'Three Dots (Menu)' पर क्लिक करें और 'Add to Home Screen' या 'Install App' चुनें।");
+    return;
+  }
   deferredInstallPrompt.prompt();
   deferredInstallPrompt.userChoice.then(choice => {
     if (choice.outcome === 'accepted') {
-      document.getElementById('installBar').classList.remove('show');
+      const banner = document.getElementById('installBar');
+      if (banner) banner.style.display = 'none';
     }
     deferredInstallPrompt = null;
   });
 }
 
-// SERVICE WORKER ATTACHMENT
+// REAL FILE-BASED SERVICE WORKER REGISTRATION
 let swReg = null;
 async function registerSW() {
   if (!('serviceWorker' in navigator)) {
     setSWStatus('SW NOT SUPPORTED', false); return;
   }
   try {
-    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' }); 
+    swReg = await navigator.serviceWorker.register('sw.js'); 
     setSWStatus('BACKGROUND ENGINE ACTIVE', true);
 
     navigator.serviceWorker.addEventListener('message', e => {
@@ -345,7 +358,7 @@ async function testTelegram() {
   setTimeout(() => { btn.textContent = '⟳ SEND TEST MESSAGE'; }, 3000);
 }
 
-// SYSTEM CALCULATIONS & METRICS
+// IN-MEMORY METRIC LOSS STATE TRACKER
 let consecutiveLosses = 0, tgAlertSent = false;
 
 async function checkLossStreak(wl) {
@@ -366,6 +379,7 @@ async function checkLossStreak(wl) {
   }
 }
 
+// PIPELINE FLOW
 const API = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
 let predMap={}, numMap1={}, numMap2={}, histLog=[], nextExpectedPeriod=null;
 
