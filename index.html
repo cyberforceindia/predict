@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="theme-color" content="#040810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pred Hub">
+
+<link rel="manifest" href="manifest.json">
+
+<title>Hacker's Prediction Hub - Big Money Edition</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+:root{
+  --green:#00ff88;--cyan:#00e5ff;--red:#ff2d55;--gold:#ffd700;
+  --bg:#040810;--bg2:#070d18;--bg3:#0a1222;
+  --border:#0d2035;--border2:#102540;--dim:#2a4a60;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:#a0c4d8;font-family:'Share Tech Mono',monospace;min-height:100vh;overflow-x:hidden;transition:background-color 0.3s;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:999;}
+.wrap{max-width:460px;margin:0 auto;padding:14px 13px 76px;transition:transform 0.3s;}
+.top-watermark{text-align:center;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(0,229,255,0.07);text-transform:uppercase;margin-bottom:-5px;padding-top:5px;user-select:none;}
+.hdr{text-align:center;padding:16px 0 12px;}
+.hdr::after{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);margin-top:12px;opacity:0.3;}
+.sys{font-size:8px;color:var(--dim);letter-spacing:4px;margin-bottom:7px;}
+.hdr h1{font-family:'Orbitron',monospace;font-size:17px;font-weight:900;color:#fff;letter-spacing:5px;text-shadow:0 0 14px rgba(0,229,255,0.4);}
+.hdr h1 em{color:var(--cyan);font-style:normal;}
+.srow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:9px;font-size:8px;color:var(--dim);letter-spacing:2px;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:bl 1.2s infinite;}
+@keyframes bl{0%,100%{opacity:1;box-shadow:0 0 4px var(--green);}50%{opacity:0.15;box-shadow:none;}}
+.sw-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:5px 10px;margin-bottom:10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;font-size:8px;letter-spacing:2px;}
+.sw-dot{width:5px;height:5px;border-radius:50%;background:var(--dim);flex-shrink:0;transition:background 0.3s;}
+.sw-dot.active{background:var(--green);box-shadow:0 0 6px var(--green);animation:bl 1.2s infinite;}
+.sw-dot.warn{background:var(--gold);}
+#swStatus{color:var(--dim);}
+
+.install-bar{display:none;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:10px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-radius:3px;gap:10px;}
+.install-bar.show{display:flex;}
+.install-txt{font-size:8px;color:var(--cyan);letter-spacing:2px;flex:1;}
+.install-btn{font-family:'Share Tech Mono',monospace;font-size:8px;color:#000;background:var(--cyan);border:none;border-radius:3px;padding:5px 10px;cursor:pointer;letter-spacing:2px;white-space:nowrap;font-weight:700;}
+
+.tsec{display:flex;justify-content:center;margin:16px 0 12px;}
+.tout{position:relative;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:2px;width:100%;max-width:280px;}
+.tin{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:11px 18px 9px;text-align:center;}
+.tdig{font-family:'Orbitron',monospace;font-size:40px;font-weight:700;color:#fff;letter-spacing:6px;line-height:1;text-shadow:0 0 18px rgba(0,229,255,0.4);}
+.tsub{font-size:8px;color:var(--dim);letter-spacing:4px;margin-top:4px;}
+.tbar-w{height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;}
+.tbar{height:100%;border-radius:2px;background:var(--cyan);width:100%;}
+.pcard{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:18px 14px 16px;margin-bottom:11px;text-align:center;position:relative;}
+.prow{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.pleft .plbl{font-size:8px;color:var(--dim);letter-spacing:3px;margin-bottom:3px;}
+.pleft .pval{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:1px;}
+.pright{font-size:8px;color:var(--dim);letter-spacing:3px;padding-top:2px;}
+.pill-container{display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0;}
+.pill{display:inline-block;font-family:'Orbitron',monospace;font-size:28px;font-weight:900;letter-spacing:5px;padding:11px 26px;border-radius:3px;border:1px solid;position:relative;transition:all 0.3s;}
+.pill.big{color:var(--green);background:rgba(0,255,136,0.06);border-color:var(--green);text-shadow:0 0 16px rgba(0,255,136,0.5);}
+.pill.small{color:var(--red);background:rgba(255,45,85,0.06);border-color:var(--red);text-shadow:0 0 16px rgba(255,45,85,0.5);}
+.pill.wait{color:var(--dim);background:transparent;border-color:var(--border2);}
+.num-pill{display:inline-block;font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--gold);background:rgba(255,215,0,0.06);border:1px solid var(--gold);padding:11px 20px;border-radius:3px;text-shadow:0 0 16px rgba(255,215,0,0.5);}
+.pdiv{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:13px 0 11px;}
+.alrt{font-size:9px;letter-spacing:1px;min-height:16px;padding:4px 10px;border-radius:2px;display:inline-block;}
+.alrt.win{color:var(--green);background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.2);}
+.tgpanel{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:13px 12px;margin-bottom:11px;}
+.tgh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.tgtitle{font-size:8px;color:var(--dim);letter-spacing:3px;}
+.tgbadge{font-size:8px;letter-spacing:1px;padding:2px 7px;border-radius:2px;border:1px solid;}
+.tgbadge.on{color:var(--green);border-color:rgba(0,255,136,0.3);background:rgba(0,255,136,0.05);}
+.tgbadge.off{color:var(--dim);border-color:var(--border);background:transparent;}
+.tgrow{display:flex;gap:7px;align-items:center;margin-bottom:7px;}
+.tginp{flex:1;background:var(--bg3);border:1px solid var(--border2);color:#a0c4d8;font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px 9px;border-radius:3px;letter-spacing:1px;outline:none;}
+.tginp::placeholder{color:var(--dim);}
+.tginp:focus{border-color:rgba(0,229,255,0.3);}
+.tgsave{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--cyan);background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:3px;padding:7px 12px;cursor:pointer;letter-spacing:2px;white-space:nowrap;}
+.tgtest{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--gold);background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:3px;padding:6px 10px;cursor:pointer;letter-spacing:2px;width:100%;margin-top:3px;}
+.tglabel{font-size:7px;color:var(--dim);letter-spacing:2px;margin-bottom:3px;}
+.loss-thresh{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.loss-thresh label{font-size:7px;color:var(--dim);letter-spacing:2px;}
+.loss-thresh select{background:var(--bg3);border:1px solid var(--border2);color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 7px;border-radius:3px;outline:none;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:11px;}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:11px 7px;text-align:center;}
+.sc .sl{font-size:8px;color:var(--dim);letter-spacing:2px;margin-bottom:4px;}
+.sc .sv{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;}
+.sv.g{color:var(--green);}
+.sv.r{color:var(--red);}
+.sv.gold{color:var(--gold);}
+.streak-warn{display:none;background:rgba(255,45,85,0.06);border:1px solid rgba(255,45,85,0.3);border-radius:4px;padding:10px 12px;margin-bottom:11px;text-align:center;}
+.streak-warn.show{display:block;}
+.streak-warn .sw-title{font-family:'Orbitron',monospace;font-size:11px;color:var(--red);letter-spacing:3px;font-weight:700;}
+.streak-warn .sw-sub{font-size:8px;color:var(--dim);letter-spacing:2px;margin-top:4px;}
+.hw{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:13px;}
+.hh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+.htitle{font-size:8px;color:var(--dim);letter-spacing:3px;}
+.hbadge{font-size:8px;color:var(--cyan);background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.14);border-radius:2px;padding:2px 7px;letter-spacing:1px;}
+.empty-hist{text-align:center;padding:20px;font-size:9px;color:var(--dim);letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:8px;color:var(--dim);letter-spacing:1px;padding:5px 5px;border-bottom:1px solid var(--border);text-align:center;}
+td{font-size:10px;padding:7px 5px;border-bottom:1px solid rgba(13,32,53,0.5);text-align:center;color:#2a5a70;}
+.tag{display:inline-block;padding:1px 8px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.tag.big{background:rgba(0,255,136,0.07);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.tag.small{background:rgba(255,45,85,0.07);color:var(--red);border:1px solid rgba(255,45,85,0.2);}
+.wl{display:inline-block;padding:1px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.wl.win{background:rgba(0,255,136,0.07);color:var(--green);border:1px solid rgba(0,255,136,0.18);}
+.wl.loss{background:rgba(255,45,85,0.07);color:var(--red);border:1px solid rgba(255,45,85,0.18);}
+.wl.bigmoney{background:rgba(0,255,136,0.15);color:var(--green);border:1px solid var(--green);text-shadow:0 0 12px var(--green);font-weight:900;letter-spacing:2px;}
+.bbar{position:fixed;bottom:0;left:0;right:0;background:rgba(4,8,16,0.97);border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:center;padding:9px 0 16px;z-index:200;backdrop-filter:blur(10px);}
+.sbtn{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.18);border-radius:3px;padding:7px 24px;letter-spacing:3px;cursor:pointer;outline:none;}
+.footer{text-align:center;margin-top:22px;padding:10px 0;}
+.ftext{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:4px;background:linear-gradient(90deg,var(--dim),var(--cyan),var(--green),var(--cyan),var(--dim));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 3s linear infinite;}
+@keyframes shine{0%{background-position:200% center;}100%{background-position:-200% center;}}
+@keyframes fullPageCelebration{0%{background-color:var(--bg);}25%{background-color:#022010;}50%{background-color:#04381b;}75%{background-color:#022010;}100%{background-color:var(--bg);}}
+@keyframes wrapperShake{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
+.page-celebrate{animation:fullPageCelebration 0.4s ease-in-out 5;}
+.wrapper-celebrate{animation:wrapperShake 0.4s ease-in-out 5;}
+</style>
+</head>
+<body id="entireBody">
+<div class="wrap" id="entireWrap">
+  <div class="top-watermark">@shubhammali</div>
+  <div class="hdr">
+    <div class="sys">SYS://PREDICTION_ENGINE v6.5_PWA</div>
+    <h1>⚡ <em>HACKER'S</em> HUB</h1>
+    <div class="srow">
+      <span><span class="dot"></span>LIVE</span>
+      <span>|</span>
+      <span id="clk">--:--:--</span>
+      <span>|</span>
+      <span>STRICT_SYNC</span>
+    </div>
+  </div>
+
+  <div class="sw-bar">
+    <div class="sw-dot" id="swDot"></div>
+    <span id="swStatus">INITIALIZING...</span>
+  </div>
+
+  <div class="install-bar" id="installBar">
+    <span class="install-txt">⬇ ADD TO HOME SCREEN FOR BEST EXPERIENCE</span>
+    <button class="install-btn" id="installBtn" onclick="triggerInstall()">INSTALL</button>
+  </div>
+
+  <div class="tsec">
+    <div class="tout">
+      <div class="tin">
+        <div class="tdig" id="tdig">00:60</div>
+        <div class="tsub">NEXT RESULT IN</div>
+        <div class="tbar-w"><div class="tbar" id="tbar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pcard">
+    <div class="prow">
+      <div class="pleft">
+        <div class="plbl">UPCOMING PERIOD</div>
+        <div class="pval" id="upPeriod">—</div>
+      </div>
+      <div class="pright">CURRENT PREDICTION</div>
+    </div>
+    <div class="pill-container">
+      <div class="pill wait" id="pill">—</div>
+      <div class="num-pill" id="numPill">-</div>
+    </div>
+    <div class="pdiv"></div>
+    <span class="alrt empty" id="alrt"></span>
+  </div>
+
+  <div class="sgrid">
+    <div class="sc"><div class="sl">BIG COUNT</div><div class="sv g" id="bigC">—</div></div>
+    <div class="sc"><div class="sl">SMALL COUNT</div><div class="sv r" id="smlC">—</div></div>
+    <div class="sc"><div class="sl">STREAK</div><div class="sv gold" id="strk">—</div></div>
+  </div>
+
+  <div class="streak-warn" id="streakWarn">
+    <div class="sw-title" id="streakWarnTitle">⚠ LOSS STREAK DETECTED</div>
+    <div class="sw-sub" id="streakWarnSub">Telegram alert dispatched</div>
+  </div>
+
+  <div class="tgpanel">
+    <div class="tgh">
+      <span class="tgtitle">TELEGRAM ALERT CONFIG</span>
+      <span class="tgbadge off" id="tgBadge">OFFLINE</span>
+    </div>
+    <div class="tglabel">BOT TOKEN</div>
+    <div class="tgrow">
+      <input class="tginp" id="tgToken" type="text" placeholder="123456789:ABCdef..." autocomplete="off" spellcheck="false">
+      <button class="tgsave" onclick="saveTgConfig()">SAVE</button>
+    </div>
+    <div class="tglabel">CHAT ID</div>
+    <div class="tgrow">
+      <input class="tginp" id="tgChat" type="text" placeholder="-100123456789 or @username" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="loss-thresh">
+      <label>ALERT AFTER</label>
+      <select id="lossThresh" onchange="saveTgConfig()">
+        <option value="3">3 LOSSES</option>
+        <option value="5" selected>5 LOSSES</option>
+        <option value="7">7 LOSSES</option>
+        <option value="10">10 LOSSES</option>
+      </select>
+      <label>CONSECUTIVE</label>
+    </div>
+    <button class="tgtest" onclick="testTelegram()">⟳ SEND TEST MESSAGE</button>
+  </div>
+
+  <div class="hw">
+    <div class="hh">
+      <span class="htitle">VERIFIED HISTORICAL LOG</span>
+      <span class="hbadge" id="wls">W:0 L:0</span>
+    </div>
+    <div id="histWrap">
+      <div class="empty-hist">AWAITING SYSTEM SYNCHRONIZATION...</div>
+    </div>
+  </div>
+
+  <div class="footer"><span class="ftext">⚡ BUILT BY SHUBHAM MALI ⚡</span></div>
+</div>
+<div class="bbar">
+  <button class="sbtn" onclick="loadData()">⟳ FORCE STRICT SYNC</button>
+</div>
+
+<script>
+// PWA INSTALL PROMPT — Capturing prompt
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBar').classList.add('show');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBar').classList.remove('show');
+  deferredInstallPrompt = null;
+});
+
+function triggerInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      document.getElementById('installBar').classList.remove('show');
+    }
+    deferredInstallPrompt = null;
+  });
+}
+
+// SERVICE WORKER — Strict standalone compatibility block
+const SW_CODE = `
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  if (url.includes('ar-lottery01.com') || url.includes('api.telegram.org') || url.includes('fonts.')) {
+    e.respondWith(fetch(e.request).catch(() => new Response('', {status:503})));
+    return;
+  }
+  e.respondWith(
+    caches.open('hub-v3').then(c =>
+      c.match(e.request).then(hit => hit || fetch(e.request).then(r => { c.put(e.request, r.clone()); return r; }))
+    )
+  );
+});
+
+self.addEventListener('sync', e => { if(e.tag==='pred-sync') e.waitUntil(bgPoll()); });
+self.addEventListener('periodicsync', e => { if(e.tag==='pred-periodic') e.waitUntil(bgPoll()); });
+
+async function bgPoll() {
+  try {
+    const r = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?t='+Date.now());
+    const j = await r.json();
+    const rows = j?.data?.list;
+    if(!rows?.length) return;
+    const all = await self.clients.matchAll({includeUncontrolled:true});
+    all.forEach(c => c.postMessage({type:'BG_DATA', rows}));
+  } catch(_){}
+}
+
+self.addEventListener('message', e => {
+  if(e.data?.type==='LOSS_ALERT') {
+    self.registration.showNotification('⚠️ HACKER HUB', {
+      body: e.data.streak + ' CONSECUTIVE LOSSES — Pause & review!',
+      tag:'loss', renotify:true, vibrate:[300,150,300,150,300]
+    });
+  }
+  if(e.data?.type==='WIN_ALERT') {
+    self.registration.showNotification('⚡ BIG MONEY HIT!', {
+      body: 'Number ' + e.data.number + ' predicted correctly!',
+      tag:'win', renotify:true, vibrate:[100,50,100,50,500]
+    });
+  }
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({type:'window'}).then(l => l.length ? l[0].focus() : clients.openWindow('/')));
+});
+`;
+
+let swReg = null;
+async function registerSW() {
+  if (!('serviceWorker' in navigator)) {
+    setSWStatus('SW NOT SUPPORTED', false); return;
+  }
+  try {
+    const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    // Fixed relative assignment without binding standard folder boundaries
+    swReg = await navigator.serviceWorker.register(blobUrl); 
+    setSWStatus('BACKGROUND ENGINE ACTIVE', true);
+
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'BG_DATA') processRows(e.data.rows, false);
+    });
+
+    if ('periodicSync' in swReg) {
+      try {
+        const perm = await navigator.permissions.query({ name: 'periodic-background-sync' });
+        if (perm.state === 'granted') {
+          await swReg.periodicSync.register('pred-periodic', { minInterval: 60000 });
+        }
+      } catch(_) {}
+    }
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      const p = await Notification.requestPermission();
+      if (p !== 'granted') setSWStatus('BG ACTIVE · ENABLE NOTIFICATIONS IN SETTINGS', true, true);
+    }
+  } catch(err) {
+    setSWStatus('POLLING ACTIVE (SW RESTRICTED)', false, true);
+  }
+}
+
+function setSWStatus(msg, active, warn=false) {
+  document.getElementById('swStatus').textContent = msg;
+  const d = document.getElementById('swDot');
+  d.className = 'sw-dot' + (active ? ' active' : (warn ? ' warn' : ''));
+}
+
+// TELEGRAM INTEGRATION MODULE
+let tgConfig = { token:'', chatId:'', lossThreshold:5 };
+
+function loadTgConfig() {
+  try {
+    const s = localStorage.getItem('tg_cfg');
+    if (s) {
+      tgConfig = {...tgConfig, ...JSON.parse(s)};
+      document.getElementById('tgToken').value = tgConfig.token || '';
+      document.getElementById('tgChat').value = tgConfig.chatId || '';
+      document.getElementById('lossThresh').value = tgConfig.lossThreshold || 5;
+      updateTgBadge();
+    }
+  } catch(_) {}
+}
+
+function saveTgConfig() {
+  tgConfig.token = document.getElementById('tgToken').value.trim();
+  tgConfig.chatId = document.getElementById('tgChat').value.trim();
+  tgConfig.lossThreshold = parseInt(document.getElementById('lossThresh').value);
+  localStorage.setItem('tg_cfg', JSON.stringify(tgConfig));
+  updateTgBadge();
+  showAlrt('CONFIG SAVED ✓', 'win');
+}
+
+function updateTgBadge() {
+  const b = document.getElementById('tgBadge');
+  const ok = tgConfig.token && tgConfig.chatId;
+  b.textContent = ok ? 'ONLINE' : 'OFFLINE';
+  b.className = 'tgbadge ' + (ok ? 'on' : 'off');
+}
+
+async function sendTelegram(text) {
+  if (!tgConfig.token || !tgConfig.chatId) return false;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: tgConfig.chatId, text, parse_mode:'HTML' })
+    });
+    return (await r.json()).ok === true;
+  } catch(_) { return false; }
+}
+
+async function testTelegram() {
+  saveTgConfig();
+  const btn = document.querySelector('.tgtest');
+  btn.textContent = 'SENDING...';
+  const ok = await sendTelegram(
+    `⚡ <b>HACKER'S HUB — TEST</b>\n\n✅ Bot connected!\n🔔 Alerts fire after <b>${tgConfig.lossThreshold} consecutive losses</b>.`
+  );
+  btn.textContent = ok ? '✓ SENT SUCCESSFULLY' : '✗ FAILED — CHECK CONFIG';
+  setTimeout(() => { btn.textContent = '⟳ SEND TEST MESSAGE'; }, 3000);
+}
+
+// IN-MEMORY METRIC LOSS STATE TRACKER
+let consecutiveLosses = 0, tgAlertSent = false;
+
+async function checkLossStreak(wl) {
+  if (wl === 'WIN') {
+    consecutiveLosses = 0; tgAlertSent = false;
+    document.getElementById('streakWarn').classList.remove('show');
+    return;
+  }
+  consecutiveLosses++;
+  if (consecutiveLosses >= tgConfig.lossThreshold && !tgAlertSent) {
+    tgAlertSent = true;
+    document.getElementById('streakWarnTitle').textContent = `⚠ ${consecutiveLosses}× CONSECUTIVE LOSSES`;
+    document.getElementById('streakWarnSub').textContent = tgConfig.token ? 'TELEGRAM ALERT DISPATCHED' : 'ADD BOT TOKEN FOR TELEGRAM';
+    document.getElementById('streakWarn').classList.add('show');
+    navigator.serviceWorker?.controller?.postMessage({ type:'LOSS_ALERT', streak:consecutiveLosses });
+    await sendTelegram(
+      `🔴 <b>HACKER'S HUB ALERT</b>\n\n⚠️ <b>${consecutiveLosses} CONSECUTIVE LOSSES!</b>\n📉 Streak: <b>${consecutiveLosses}×</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>\n\n💡 System diagnostic state limits reached.`
+    );
+  }
+}
+
+// DATA FLOW RENDERING PIPELINE
+const API = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
+let predMap={}, numMap={}, histLog=[], nextExpectedPeriod=null;
+
+function getActualResultType(n) { return parseInt(n,10)>=5?"BIG":"SMALL"; }
+function calcPred(issueNumber,number) {
+  const d=parseInt(String(issueNumber).slice(-1),10), n=parseInt(number,10);
+  return ((d*n)%10)%2===0?"BIG":"SMALL";
+}
+function getSingleHighestFreqNum(p,rows) {
+  const pool=p==="BIG"?[5,6,7,8,9]:[0,1,2,3,4];
+  if(!rows||rows.length<5) return p==="BIG"?6:1;
+  const counts={0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  rows.slice(0,30).forEach(r=>{const n=parseInt(r.number,10);if(!isNaN(n))counts[n]++;});
+  return pool.sort((a,b)=>counts[b]-counts[a])[0];
+}
+function addOneToPeriod(p){return String(BigInt(String(p))+1n);}
+
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById('clk').textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+  let sec=60-n.getSeconds(); if(sec===60)sec=0;
+  const dig=document.getElementById('tdig'),bar=document.getElementById('tbar');
+  dig.textContent='00:'+String(sec).padStart(2,'0');
+  bar.style.width=(sec/60*100)+'%';
+  const hot=sec<=10;
+  bar.style.background=hot?'var(--red)':'var(--cyan)';
+  dig.style.color=hot?'var(--red)':'#fff';
+},1000);
+
+function showAlrt(msg,type,dur=3000){
+  const el=document.getElementById('alrt');
+  el.textContent=msg; el.className='alrt '+type;
+  if(dur) setTimeout(()=>{el.textContent='';el.className='alrt empty';},dur);
+}
+
+function renderHistory(){
+  const wrap=document.getElementById('histWrap'),wlEl=document.getElementById('wls');
+  if(!histLog.length){wrap.innerHTML='<div class="empty-hist">WAITING FOR NEXT PERIOD VALIDATION...</div>';wlEl.textContent="W:0 L:0";return;}
+  let html='<table><thead><tr><th>PERIOD</th><th>NUM</th><th>RESULT</th><th>PRED</th><th>STATUS</th></tr></thead><tbody>';
+  histLog.slice(0,5).forEach(row=>{
+    const tc=row.actual==="BIG"?"big":"small",pc=row.pred==="BIG"?"var(--green)":"var(--red)";
+    let wlTag=row.wl==="WIN"?'<span class="wl win">WIN</span>':'<span class="wl loss">LOSS</span>';
+    if(row.isBigMoneyHit) wlTag='<span class="wl bigmoney">BIG MONEY</span>';
+    html+=`<tr><td>...${String(row.period).slice(-6)}</td><td style="color:#fff;font-weight:bold;">${row.number}</td><td><span class="tag ${tc}">${row.actual}</span></td><td style="color:${pc}">${row.pred} <span style="font-size:8px;color:var(--gold);">[${row.predNum}]</span></td><td>${wlTag}</td></tr>`;
+  });
+  let w=0,l=0; histLog.forEach(r=>{if(r.wl==="WIN")w++;else l++;});
+  wrap.innerHTML=html+'</tbody></table>';
+  wlEl.textContent="W:"+w+" L:"+l;
+}
+
+async function processRows(rows,updateUI=true){
+  if(!rows?.length) return;
+  const curP=String(rows[0].issueNumber),curN=String(rows[0].number),actualType=getActualResultType(curN);
+
+  if(nextExpectedPeriod!==null&&curP===nextExpectedPeriod&&predMap.hasOwnProperty(curP)){
+    const sp=predMap[curP],pn=numMap[curP];
+    let wl=sp===actualType?"WIN":"LOSS";
+    const hit=(pn===parseInt(curN,10));
+    if(hit){
+      wl="WIN";
+      if(updateUI){
+        document.getElementById('entireBody').classList.add('page-celebrate');
+        document.getElementById('entireWrap').classList.add('wrapper-celebrate');
+        setTimeout(()=>{document.getElementById('entireBody').classList.remove('page-celebrate');document.getElementById('entireWrap').classList.remove('wrapper-celebrate');},2000);
+        showAlrt("⚡ BIG MONEY HIT UNLOCKED! ⚡","win",4000);
+      }
+      navigator.serviceWorker?.controller?.postMessage({type:'WIN_ALERT',number:pn});
+      await sendTelegram(`💰 <b>BIG MONEY HIT!</b>\n\n🎯 Number <b>${pn}</b> correct!\n⚡ Period: <b>...${curP.slice(-6)}</b>\n⏰ <b>${new Date().toLocaleTimeString()}</b>`);
+    }
+    histLog.unshift({period:curP,number:curN,actual:actualType,pred:sp,predNum:pn,wl,isBigMoneyHit:hit});
+    if(histLog.length>20) histLog.pop();
+    await checkLossStreak(wl);
+    nextExpectedPeriod=null;
+  }
+
+  const up=addOneToPeriod(curP);
+  if(nextExpectedPeriod===null){
+    const pred=calcPred(curP,curN),tgt=getSingleHighestFreqNum(pred,rows);
+    predMap[up]=pred; numMap[up]=tgt; nextExpectedPeriod=up;
+    if(updateUI){
+      document.getElementById('upPeriod').textContent=up.slice(-6);
+      const pill=document.getElementById('pill');
+      pill.textContent=pred; pill.className='pill '+(pred==="BIG"?"big":"small");
+      document.getElementById('numPill').textContent=tgt;
+    }
+  }
+
+  if(updateUI){
+    let big=0,small=0;
+    rows.forEach(r=>{if(getActualResultType(r.number)==="BIG")big++;else small++;});
+    document.getElementById('bigC').textContent=big;
+    document.getElementById('smlC').textContent=small;
+    let side=getActualResultType(rows[0].number),streak=1;
+    for(let i=1;i<rows.length;i++){if(getActualResultType(rows[i].number)===side)streak++;else break;}
+    document.getElementById('strk').textContent=streak+'×'+side;
+    renderHistory();
+  }
+}
+
+async function loadData(){
+  try{
+    const res=await fetch(API+"?nocache="+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    const rows=json?.data?.list;
+    if(!rows?.length) throw new Error('empty');
+    await processRows(rows,true);
+    if(swReg?.sync) await swReg.sync.register('pred-sync').catch(()=>{});
+  }catch(err){console.error('Sync error:',err);}
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible') loadData();
+});
+
+(async()=>{
+  loadTgConfig();
+  await registerSW();
+  await loadData();
+  setInterval(loadData,3000);
+})();
+</script>
+</body>
+</html>
