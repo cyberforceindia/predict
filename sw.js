@@ -8,7 +8,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    caches.open('hub-v4').then(c =>
+    caches.open('hub-v5').then(c =>
       c.match(e.request).then(hit => hit || fetch(e.request).then(r => { c.put(e.request, r.clone()); return r; }))
     )
   );
@@ -31,13 +31,13 @@ async function bgPoll() {
 self.addEventListener('message', e => {
   if(e.data?.type==='LOSS_ALERT') {
     self.registration.showNotification('⚠️ HACKER HUB', {
-      body: e.data.streak + ' CONSECUTIVE LOSSES — Pause & review!',
+      body: e.data.streak + ' CONSECUTIVE LOSSES — Review state bounds!',
       tag:'loss', renotify:true, vibrate:[300,150,300,150,300]
     });
   }
   if(e.data?.type==='WIN_ALERT') {
     self.registration.showNotification('⚡ BIG MONEY HIT!', {
-      body: 'Numbers predicted correctly!',
+      body: 'Dual numbers sequence resolved successfully!',
       tag:'win', renotify:true, vibrate:[100,50,100,50,500]
     });
   }
